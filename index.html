@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -214,6 +214,7 @@
         </div>
 
         <div class="main-content">
+            <!-- 왼쪽 패널 -->
             <div class="control-panel flex flex-col gap-6">
                 <div>
                     <h3 class="text-xs font-bold mb-3 uppercase tracking-widest text-slate-400">Resolution</h3>
@@ -243,13 +244,14 @@
                 </div>
             </div>
 
+            <!-- 지도 영역 -->
             <div id="map-wrapper">
                 <div class="compass-label" style="top: 8px; left: 50%; transform: translateX(-50%);">N</div>
                 <div class="compass-label" style="top: 12px; right: 12px;">NE</div>
                 <div class="compass-label" style="top: 50%; right: 8px; transform: translateY(-50%);">E</div>
                 <div class="compass-label" style="bottom: 12px; right: 12px;">SE</div>
                 <div class="compass-label" style="bottom: 8px; left: 50%; transform: translateX(-50%);">S</div>
-                <div class="compass-label" style="bottom: 12px; left: 12px;">SW</div>
+                <div class="compass-label" style="bottom: 12px; right: 12px;">SW</div>
                 <div class="compass-label" style="top: 50%; left: 8px; transform: translateY(-50%);">W</div>
                 <div class="compass-label" style="top: 12px; left: 12px;">NW</div>
 
@@ -276,9 +278,10 @@
                 </div>
             </div>
 
+            <!-- 오른쪽 패널 -->
             <div class="control-panel flex flex-col gap-6">
                 <div>
-                    <h3 class="text-xs font-bold mb-3 uppercase tracking-widest text-slate-400">Layers (1-8 / F,G)</h3>
+                    <h3 class="text-xs font-bold mb-3 uppercase tracking-widest text-slate-400">Layers (1-8)</h3>
                     <div class="grid grid-cols-4 gap-1 mb-3" id="layer-btn-container"></div>
                     <div class="text-[10px] text-center text-emerald-400 font-bold uppercase tracking-widest" id="ui-active-layer-name">Active: Layer 1</div>
                 </div>
@@ -286,31 +289,32 @@
                 <div>
                     <h3 class="text-xs font-bold mb-3 uppercase tracking-widest text-slate-400">Colors (Q-T)</h3>
                     <div class="flex gap-2.5 mb-4 justify-center">
-                        <button onclick="App.setBrushColor('#ffffff', 'white')" class="color-btn bg-white" id="color-white"></button>
-                        <button onclick="App.setBrushColor('#10b981', 'green')" class="color-btn bg-emerald-500" id="color-green"></button>
-                        <button onclick="App.setBrushColor('#3b82f6', 'blue')" class="color-btn bg-blue-500" id="color-blue"></button>
-                        <button onclick="App.setBrushColor('#f43f5e', 'red')" class="color-btn bg-rose-500" id="color-red"></button>
-                        <button onclick="App.setBrushColor('#fbbf24', 'yellow')" class="color-btn bg-amber-400" id="color-yellow"></button>
+                        <button onclick="App.setDrawColor('#ffffff', 'white')" class="color-btn bg-white" id="color-white"></button>
+                        <button onclick="App.setDrawColor('#10b981', 'green')" class="color-btn bg-emerald-500" id="color-green"></button>
+                        <button onclick="App.setDrawColor('#3b82f6', 'blue')" class="color-btn bg-blue-500" id="color-blue"></button>
+                        <button onclick="App.setDrawColor('#f43f5e', 'red')" class="color-btn bg-rose-500" id="color-red"></button>
+                        <button onclick="App.setDrawColor('#fbbf24', 'yellow')" class="color-btn bg-amber-400" id="color-yellow"></button>
                     </div>
                     
-                    <h3 class="text-xs font-bold mb-3 uppercase tracking-widest text-slate-400">Stroke Weight (S,D)</h3>
-                    <div class="flex gap-2 mb-4">
-                        <button onclick="App.setBrushWeight(2)" id="btn-weight-thin" class="flex-1 btn-tool py-2">Thin</button>
-                        <button onclick="App.setBrushWeight(6)" id="btn-weight-thick" class="flex-1 btn-tool py-2">Thick</button>
+                    <h3 class="text-xs font-bold mb-3 uppercase tracking-widest text-slate-400">Drawing Tools (S,D)</h3>
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                        <button onclick="App.setDrawTool('pen')" id="btn-tool-pen" class="btn-tool py-2">Pen</button>
+                        <button onclick="App.setDrawTool('line')" id="btn-tool-line" class="btn-tool py-2">Line</button>
+                        <button onclick="App.setDrawTool('rect')" id="btn-tool-rect" class="btn-tool py-2">Rect</button>
+                        <button onclick="App.setDrawTool('circle')" id="btn-tool-circle" class="btn-tool py-2">Circle</button>
                     </div>
+                    <p class="text-[10px] text-slate-500 mb-4 text-center">단축키 'A' 또는 롱클릭으로 아이콘 메뉴 열기</p>
                 </div>
 
                 <div>
                     <h3 class="text-xs font-bold mb-3 uppercase tracking-widest text-slate-400">Actions</h3>
                     <div class="flex flex-col gap-2">
                         <button onclick="App.undo()" class="btn-tool uppercase py-2.5">Undo (Z)</button>
-                        <button onclick="App.UI.showModal('modal-clear-layer')" class="btn-tool uppercase py-2.5">Clear Layer</button>
+                        <button onclick="App.UI.showModal('modal-clear-layer')" class="btn-tool uppercase py-2.5">Clear Layer (X)</button>
                         <button onclick="App.UI.showModal('modal-clear-all')" class="btn-tool uppercase py-2.5">Reset All</button>
                     </div>
-                    
-                    <p class="text-[10px] text-slate-500 my-4 text-center">Press 'A' or Long-click for icons</p>
 
-                    <button onclick="App.downloadMap()" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg text-sm font-bold shadow-lg uppercase tracking-widest">
+                    <button onclick="App.downloadMap()" class="w-full mt-6 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg text-sm font-bold shadow-lg uppercase tracking-widest">
                         Export Map Image
                     </button>
                 </div>
@@ -318,33 +322,30 @@
         </div>
     </div>
 
+    <!-- 모달창 -->
     <div id="modal-clear-layer" class="modal-overlay">
         <div class="bg-[#1e1e1e] border border-[#3f3f3f] p-8 rounded-xl shadow-2xl max-w-sm w-full mx-4 text-center">
-            <h2 class="text-xl font-bold mb-4">Clear Layer?</h2>
+            <h2 class="text-xl font-bold mb-4" id="modal-clear-layer-title">현재 레이어를 비울까요?</h2>
+            <p class="text-sm text-slate-400 mb-6" id="modal-clear-layer-desc">현재 활성화된 n번 레이어가 비워집니다.</p>
             <div class="flex gap-3">
-                <button onclick="App.UI.hideModal('modal-clear-layer')" class="flex-1 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-bold">Cancel</button>
-                <button onclick="App.confirmClearLayer()" class="flex-1 py-2 bg-amber-600 hover:bg-amber-500 rounded-lg text-sm font-bold">Clear</button>
+                <button onclick="App.UI.hideModal('modal-clear-layer')" class="flex-1 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-bold">취소</button>
+                <button onclick="App.confirmClearLayer()" class="flex-1 py-2 bg-amber-600 hover:bg-amber-500 rounded-lg text-sm font-bold">비우기</button>
             </div>
         </div>
     </div>
 
     <div id="modal-clear-all" class="modal-overlay">
         <div class="bg-[#1e1e1e] border border-[#3f3f3f] p-8 rounded-xl shadow-2xl max-w-sm w-full mx-4 text-center">
-            <h2 class="text-xl font-bold mb-4">Reset Map?</h2>
-            <p class="text-sm text-slate-400 mb-6">All drawing data will be permanently deleted.</p>
+            <h2 class="text-xl font-bold mb-4">모든 레이어를 비울까요?</h2>
+            <p class="text-sm text-slate-400 mb-6">모든 레이어가 비워집니다.</p>
             <div class="flex gap-3">
-                <button onclick="App.UI.hideModal('modal-clear-all')" class="flex-1 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-bold">Cancel</button>
-                <button onclick="App.confirmClearAll()" class="flex-1 py-2 bg-rose-600 hover:bg-rose-500 rounded-lg text-sm font-bold">Reset All</button>
+                <button onclick="App.UI.hideModal('modal-clear-all')" class="flex-1 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-bold">취소</button>
+                <button onclick="App.confirmClearAll()" class="flex-1 py-2 bg-rose-600 hover:bg-rose-500 rounded-lg text-sm font-bold">전체 초기화</button>
             </div>
         </div>
     </div>
 
     <script>
-/**
- * Maru Tactical Map Tool - OOP English Edition
- * 아이콘 추가 후 브러시 그리기가 멈추는 버그 수정
- */
-
 const App = {
     CONFIG: {
         WRAPPER_PADDING: 64,
@@ -352,7 +353,8 @@ const App = {
         MAX_HISTORY: 30,
         COLS: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
         ROWS: ['1', '2', '3', '4', '5', '6', '7', '8'],
-        COMPASS: ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+        COMPASS: ["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
+        TOOLS: ['pen', 'line', 'rect', 'circle']
     },
 
     state: {
@@ -360,12 +362,13 @@ const App = {
         template: 'arena',
         system: 'standard',
         activeLayer: 0,
-        brushColor: '#ffffff',
-        brushWeight: 2,
+        drawColor: '#ffffff',
+        drawWeight: 3,
+        drawTool: 'pen', 
         isDrawing: false,
-        isIconMode: false, // 아이콘 모드 플래그
+        isIconMode: false,
         lastCursor: { x: 0, y: 0 },
-        iconTriggerPos: { x: 0, y: 0 },
+        startCursor: { x: 0, y: 0 },
         longPressTimer: null,
         gridStep: 600 / 8,
         histories: Array.from({ length: 8 }, () => [])
@@ -386,8 +389,8 @@ const App = {
         this.setTemplate('arena');
         this.setSystem('standard');
         this.setActiveLayer(0);
-        this.setBrushColor('#ffffff', 'white');
-        this.setBrushWeight(2);
+        this.setDrawColor('#ffffff', 'white');
+        this.setDrawTool('pen');
     },
 
     cacheElements() {
@@ -446,18 +449,25 @@ const App = {
         this.elements.layerName.innerText = `Active: Layer ${idx + 1}`;
     },
 
-    setBrushColor(color, label) {
-        this.state.brushColor = color;
+    setDrawColor(color, label) {
+        this.state.drawColor = color;
         ['white', 'green', 'blue', 'red', 'yellow'].forEach(c => {
             const b = document.getElementById(`color-${c}`);
             if (b) b.classList.toggle('color-selected', c === label);
         });
     },
 
-    setBrushWeight(w) {
-        this.state.brushWeight = w;
-        document.getElementById('btn-weight-thin').classList.toggle('btn-active', w === 2);
-        document.getElementById('btn-weight-thick').classList.toggle('btn-active', w === 6);
+    setDrawTool(tool) {
+        this.state.drawTool = tool;
+        this.UI.updateBtnGroup('btn-tool-', tool, this.CONFIG.TOOLS);
+    },
+
+    cycleTool(direction) {
+        const tools = this.CONFIG.TOOLS;
+        let idx = tools.indexOf(this.state.drawTool);
+        if (direction === 'next') idx = (idx + 1) % tools.length;
+        else idx = (idx - 1 + tools.length) % tools.length;
+        this.setDrawTool(tools[idx]);
     },
 
     Renderer: {
@@ -521,12 +531,7 @@ const App = {
             }
 
             for (let j = 0; j < countY; j++) {
-                let txt;
-                if (system === 'inverted') {
-                    txt = ROWS[countY - 1 - j];
-                } else {
-                    txt = ROWS[j];
-                }
+                let txt = system === 'inverted' ? ROWS[countY - 1 - j] : ROWS[j];
                 app.UI.createAxisLabel(txt, 30, (j + offsetY) * gridStep + WRAPPER_PADDING, 30, gridStep);
             }
         },
@@ -566,36 +571,60 @@ const App = {
                 if (!e.touches && e.button !== 0) return;
                 const p = getPos(e);
                 
-                // 메뉴가 열려있는데 바닥을 클릭하면 닫기
                 if (app.elements.menu.style.display === 'flex') {
                     app.elements.menu.style.display = 'none';
                     app.state.isIconMode = false;
                     return; 
                 }
 
-                app.state.iconTriggerPos = p;
+                app.state.startCursor = p;
                 app.state.longPressTimer = setTimeout(() => app.UI.showShapeMenu(app), app.CONFIG.LONG_PRESS_THRESHOLD);
                 app.state.isDrawing = true;
-                const ctx = app.layers[app.state.activeLayer].ctx;
-                ctx.beginPath(); ctx.moveTo(p.x, p.y);
+                
+                if (app.state.drawTool === 'pen') {
+                    const ctx = app.layers[app.state.activeLayer].ctx;
+                    ctx.beginPath(); ctx.moveTo(p.x, p.y);
+                }
             };
             const move = (e) => {
                 const p = getPos(e);
                 app.state.lastCursor = p;
-                if (app.state.longPressTimer && (Math.abs(p.x - app.state.iconTriggerPos.x) > 5 || Math.abs(p.y - app.state.iconTriggerPos.y) > 5)) {
+                if (app.state.longPressTimer && (Math.abs(p.x - app.state.startCursor.x) > 5 || Math.abs(p.y - app.state.startCursor.y) > 5)) {
                     clearTimeout(app.state.longPressTimer); app.state.longPressTimer = null;
                 }
                 app.updateRealtimeInfo(p.x, p.y);
+                
                 if (app.state.isDrawing && !app.state.isIconMode) {
+                    const tool = app.state.drawTool;
                     const ctx = app.layers[app.state.activeLayer].ctx;
-                    ctx.lineTo(p.x, p.y);
-                    ctx.strokeStyle = app.state.brushColor; ctx.lineWidth = app.state.brushWeight;
-                    ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke();
+
+                    if (tool === 'pen') {
+                        ctx.lineTo(p.x, p.y);
+                        ctx.strokeStyle = app.state.drawColor; ctx.lineWidth = app.state.drawWeight;
+                        ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke();
+                    } else {
+                        app.uctx.clearRect(0, 0, app.state.resolution, app.state.resolution);
+                        app.uctx.strokeStyle = app.state.drawColor;
+                        app.uctx.lineWidth = app.state.drawWeight;
+                        app.uctx.setLineDash([5, 5]);
+                        app.drawShape(app.uctx, app.state.startCursor, p, tool);
+                        app.uctx.setLineDash([]);
+                    }
                 }
             };
             const end = () => {
                 if (app.state.longPressTimer) { clearTimeout(app.state.longPressTimer); app.state.longPressTimer = null; }
-                if (app.state.isDrawing) { app.state.isDrawing = false; if (!app.state.isIconMode) app.pushHistory(); }
+                if (app.state.isDrawing) {
+                    if (!app.state.isIconMode && app.state.drawTool !== 'pen') {
+                        const ctx = app.layers[app.state.activeLayer].ctx;
+                        ctx.strokeStyle = app.state.drawColor;
+                        ctx.lineWidth = app.state.drawWeight;
+                        app.drawShape(ctx, app.state.startCursor, app.state.lastCursor, app.state.drawTool);
+                        app.uctx.clearRect(0, 0, app.state.resolution, app.state.resolution);
+                    }
+                    app.state.isDrawing = false; 
+                    if (!app.state.isIconMode) app.pushHistory(); 
+                }
             };
             canvas.addEventListener('mousedown', start);
             canvas.addEventListener('mousemove', move);
@@ -613,23 +642,43 @@ const App = {
         }
     },
 
+    drawShape(ctx, start, end, tool) {
+        ctx.beginPath();
+        if (tool === 'line') {
+            ctx.moveTo(start.x, start.y);
+            ctx.lineTo(end.x, end.y);
+        } else if (tool === 'rect') {
+            ctx.rect(start.x, start.y, end.x - start.x, end.y - start.y);
+        } else if (tool === 'circle') {
+            const r = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
+            ctx.arc(start.x, start.y, r, 0, Math.PI * 2);
+        }
+        ctx.stroke();
+    },
+
     handleKeyboard(e) {
         const k = e.key.toLowerCase();
         const n = parseInt(e.key);
-        if (n >= 1 && n <= 8) this.setActiveLayer(n - 1);
-        else if (k === 'f') this.setActiveLayer((this.state.activeLayer + 7) % 8);
-        else if (k === 'g') this.setActiveLayer((this.state.activeLayer + 1) % 8);
-        else if (k === 'q') this.setBrushColor('#ffffff', 'white');
-        else if (k === 'w') this.setBrushColor('#10b981', 'green');
-        else if (k === 'e') this.setBrushColor('#3b82f6', 'blue');
-        else if (k === 'r') this.setBrushColor('#f43f5e', 'red');
-        else if (k === 't') this.setBrushColor('#fbbf24', 'yellow');
-        else if (k === 's') this.setBrushWeight(2);
-        else if (k === 'd') this.setBrushWeight(6);
-        else if (k === 'z') this.undo();
-        else if (k === 'a') { 
-            this.state.iconTriggerPos = {...this.state.lastCursor}; 
-            this.UI.showShapeMenu(this); 
+        
+        if (!isNaN(n) && n >= 1 && n <= 8) {
+            this.setActiveLayer(n - 1);
+            return;
+        }
+
+        switch(k) {
+            case 'q': this.setDrawColor('#ffffff', 'white'); break;
+            case 'w': this.setDrawColor('#10b981', 'green'); break;
+            case 'e': this.setDrawColor('#3b82f6', 'blue'); break;
+            case 'r': this.setDrawColor('#f43f5e', 'red'); break;
+            case 't': this.setDrawColor('#fbbf24', 'yellow'); break;
+            case 's': this.cycleTool('prev'); break;
+            case 'd': this.cycleTool('next'); break;
+            case 'a':
+                this.state.startCursor = {...this.state.lastCursor}; 
+                this.UI.showShapeMenu(this); 
+                break;
+            case 'z': this.undo(); break;
+            case 'x': this.UI.showModal('modal-clear-layer'); break;
         }
     },
 
@@ -702,9 +751,9 @@ const App = {
     },
 
     addIcon(type) {
-        const { x, y } = this.state.iconTriggerPos;
+        const { x, y } = this.state.startCursor;
         const ctx = this.layers[this.state.activeLayer].ctx;
-        const r = 18; ctx.strokeStyle = ctx.fillStyle = this.state.brushColor; ctx.lineWidth = 3; ctx.beginPath();
+        const r = 18; ctx.strokeStyle = ctx.fillStyle = this.state.drawColor; ctx.lineWidth = 3; ctx.beginPath();
         switch(type) {
             case 'mark-x': ctx.moveTo(x-r, y-r); ctx.lineTo(x+r, y+r); ctx.moveTo(x+r, y-r); ctx.lineTo(x-r, y+r); ctx.stroke(); break;
             case 'circle': ctx.arc(x, y, r, 0, Math.PI*2); ctx.stroke(); break;
@@ -723,7 +772,7 @@ const App = {
         }
         this.pushHistory(); 
         this.elements.menu.style.display = 'none';
-        this.state.isIconMode = false; // 아이콘 선택 후 모드 해제
+        this.state.isIconMode = false; 
     },
 
     downloadMap() {
@@ -769,11 +818,18 @@ const App = {
         showShapeMenu(app) {
             app.state.isIconMode = true; 
             app.state.isDrawing = false;
-            app.elements.menu.style.left = app.state.iconTriggerPos.x + 'px';
-            app.elements.menu.style.top = app.state.iconTriggerPos.y + 'px';
+            app.uctx.clearRect(0, 0, app.state.resolution, app.state.resolution);
+            app.elements.menu.style.left = app.state.startCursor.x + 'px';
+            app.elements.menu.style.top = app.state.startCursor.y + 'px';
             app.elements.menu.style.display = 'flex';
         },
-        showModal(id) { document.getElementById(id).style.display = 'flex'; },
+        showModal(id) { 
+            if (id === 'modal-clear-layer') {
+                const layerNum = App.state.activeLayer + 1;
+                document.getElementById('modal-clear-layer-desc').innerText = `현재 활성화된 ${layerNum}번 레이어가 비워집니다.`;
+            }
+            document.getElementById(id).style.display = 'flex'; 
+        },
         hideModal(id) { document.getElementById(id).style.display = 'none'; }
     }
 };
