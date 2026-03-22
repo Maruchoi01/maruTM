@@ -110,9 +110,10 @@
         }
 
         .btn-tool:hover { background-color: #3d3d3d; }
+        
         .btn-active {
-            outline: 2px solid #ffffff;
-            background-color: var(--bg-card) !important;
+            outline: 2px solid #ffffff !important;
+            background-color: #444 !important;
             color: white !important;
         }
 
@@ -192,7 +193,7 @@
 <body>
 
     <div class="app-container">
-        <h1 class="text-3xl font-bold mb-6 tracking-tight uppercase">Maru Tactical Map</h1>
+        <h1 class="text-3xl font-bold mb-6 tracking-tight uppercase text-white">Maru Tactical Map</h1>
 
         <div class="flex gap-4 mb-6 flex-wrap justify-center">
             <div class="info-box">
@@ -214,7 +215,6 @@
         </div>
 
         <div class="main-content">
-            <!-- 왼쪽 패널 -->
             <div class="control-panel flex flex-col gap-6">
                 <div>
                     <h3 class="text-xs font-bold mb-3 uppercase tracking-widest text-slate-400">Resolution</h3>
@@ -244,14 +244,13 @@
                 </div>
             </div>
 
-            <!-- 지도 영역 -->
             <div id="map-wrapper">
                 <div class="compass-label" style="top: 8px; left: 50%; transform: translateX(-50%);">N</div>
                 <div class="compass-label" style="top: 12px; right: 12px;">NE</div>
                 <div class="compass-label" style="top: 50%; right: 8px; transform: translateY(-50%);">E</div>
                 <div class="compass-label" style="bottom: 12px; right: 12px;">SE</div>
                 <div class="compass-label" style="bottom: 8px; left: 50%; transform: translateX(-50%);">S</div>
-                <div class="compass-label" style="bottom: 12px; right: 12px;">SW</div>
+                <div class="compass-label" style="bottom: 12px; left: 12px;">SW</div>
                 <div class="compass-label" style="top: 50%; left: 8px; transform: translateY(-50%);">W</div>
                 <div class="compass-label" style="top: 12px; left: 12px;">NW</div>
 
@@ -278,12 +277,12 @@
                 </div>
             </div>
 
-            <!-- 오른쪽 패널 -->
             <div class="control-panel flex flex-col gap-6">
                 <div>
                     <h3 class="text-xs font-bold mb-3 uppercase tracking-widest text-slate-400">Layers (1-8)</h3>
                     <div class="grid grid-cols-4 gap-1 mb-3" id="layer-btn-container"></div>
-                    <div class="text-[10px] text-center text-emerald-400 font-bold uppercase tracking-widest" id="ui-active-layer-name">Active: Layer 1</div>
+                    <div class="text-[10px] text-center font-bold uppercase tracking-widest transition-colors duration-300" id="ui-active-layer-name">Active: Layer 1</div>
+                    <p class="text-[9px] text-slate-500 mt-2 text-center">활성 레이어를 다시 누르면 숨김/표시</p>
                 </div>
 
                 <div>
@@ -303,7 +302,6 @@
                         <button onclick="App.setDrawTool('rect')" id="btn-tool-rect" class="btn-tool py-2">Rect</button>
                         <button onclick="App.setDrawTool('circle')" id="btn-tool-circle" class="btn-tool py-2">Circle</button>
                     </div>
-                    <p class="text-[10px] text-slate-500 mb-4 text-center">단축키 'A' 또는 롱클릭으로 아이콘 메뉴 열기</p>
                 </div>
 
                 <div>
@@ -314,7 +312,7 @@
                         <button onclick="App.UI.showModal('modal-clear-all')" class="btn-tool uppercase py-2.5">Reset All</button>
                     </div>
 
-                    <button onclick="App.downloadMap()" class="w-full mt-6 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg text-sm font-bold shadow-lg uppercase tracking-widest">
+                    <button onclick="App.downloadMap()" class="w-full mt-6 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg text-sm font-bold shadow-lg uppercase tracking-widest transition-all">
                         Export Map Image
                     </button>
                 </div>
@@ -322,7 +320,6 @@
         </div>
     </div>
 
-    <!-- 모달창 -->
     <div id="modal-clear-layer" class="modal-overlay">
         <div class="bg-[#1e1e1e] border border-[#3f3f3f] p-8 rounded-xl shadow-2xl max-w-sm w-full mx-4 text-center">
             <h2 class="text-xl font-bold mb-4" id="modal-clear-layer-title">현재 레이어를 비울까요?</h2>
@@ -444,9 +441,24 @@ const App = {
     },
 
     setActiveLayer(idx) {
-        this.state.activeLayer = idx;
-        this.UI.updateBtnGroup('btn-layer-', idx, [0, 1, 2, 3, 4, 5, 6, 7]);
-        this.elements.layerName.innerText = `Active: Layer ${idx + 1}`;
+        // 이미 선택된 레이어를 다시 선택하면 가시성 토글
+        if (this.state.activeLayer === idx) {
+            this.toggleLayerVisibility(idx);
+        } else {
+            this.state.activeLayer = idx;
+            // 활성화될 때 숨겨져 있었다면 다시 보여줌 (선택했는데 안보이면 곤란하므로)
+            if (!this.layers[idx].visible) {
+                this.toggleLayerVisibility(idx);
+            }
+        }
+        this.UI.refreshActiveLayerInfo(this);
+    },
+
+    toggleLayerVisibility(idx = this.state.activeLayer) {
+        const layer = this.layers[idx];
+        layer.visible = !layer.visible;
+        layer.canvas.style.display = layer.visible ? 'block' : 'none';
+        this.UI.refreshActiveLayerInfo(this);
     },
 
     setDrawColor(color, label) {
@@ -473,7 +485,7 @@ const App = {
     Renderer: {
         renderGrid(app) {
             const { gctx, state } = app;
-            const { resolution, template, gridStep, system } = state;
+            const { resolution, template, gridStep } = state;
             const center = resolution / 2;
             gctx.setTransform(1, 0, 0, 1, 0, 0);
             gctx.clearRect(0, 0, resolution, resolution);
@@ -553,7 +565,7 @@ const App = {
             for (let i = 0; i < 8; i++) {
                 const canvas = document.createElement('canvas');
                 canvas.id = `canvas-layer-${i}`; hook.appendChild(canvas);
-                app.layers.push({ canvas: canvas, ctx: canvas.getContext('2d') });
+                app.layers.push({ canvas: canvas, ctx: canvas.getContext('2d'), visible: true });
                 app.pushHistory(i);
             }
         }
@@ -695,9 +707,7 @@ const App = {
         if (colIdx >= offsetX && colIdx < (offsetX + countX) && rowIdx >= offsetY && rowIdx < (offsetY + countY)) {
             let displayCol = CONFIG.COLS[colIdx - offsetX];
             let displayRowIndex = (rowIdx - offsetY);
-            if (state.system === 'inverted') {
-                displayRowIndex = (countY - 1) - displayRowIndex;
-            }
+            if (state.system === 'inverted') displayRowIndex = (countY - 1) - displayRowIndex;
             coord = displayCol + CONFIG.ROWS[displayRowIndex];
         }
         
@@ -783,14 +793,13 @@ const App = {
         dCtx.fillStyle = '#1a1a1a'; dCtx.fillRect(0, 0, fullSize, fullSize);
         dCtx.fillStyle = '#121212'; dCtx.fillRect(WRAPPER_PADDING, WRAPPER_PADDING, resolution, resolution);
         dCtx.drawImage(this.elements.grid, WRAPPER_PADDING, WRAPPER_PADDING);
-        this.layers.forEach(l => dCtx.drawImage(l.canvas, WRAPPER_PADDING, WRAPPER_PADDING));
+        this.layers.forEach(l => { if (l.visible) dCtx.drawImage(l.canvas, WRAPPER_PADDING, WRAPPER_PADDING); });
         dCtx.fillStyle = '#ffffff'; dCtx.font = 'bold 14px monospace'; dCtx.textAlign = 'center';
         this.elements.labels.querySelectorAll('.axis-label').forEach(el => {
             const lx = parseFloat(el.style.left); const ly = parseFloat(el.style.top);
             dCtx.fillText(el.innerText, lx + parseFloat(el.style.width)/2, ly + 18);
         });
-        const a = document.createElement('a'); a.download = `Map_${Date.now()}.png`;
-        a.href = dl.toDataURL(); a.click();
+        const a = document.createElement('a'); a.download = `Map_${Date.now()}.png`; a.href = dl.toDataURL(); a.click();
     },
 
     UI: {
@@ -799,7 +808,7 @@ const App = {
             for (let i = 0; i < 8; i++) {
                 const btn = document.createElement('button');
                 btn.id = `btn-layer-${i}`;
-                btn.className = "bg-slate-700/50 hover:bg-slate-600 text-white py-1.5 rounded font-bold text-[11px] border border-slate-600 transition-colors";
+                btn.className = "bg-slate-700/50 hover:bg-slate-600 text-white py-1.5 rounded font-bold text-[11px] border border-slate-600 transition-all";
                 btn.innerText = `L${i + 1}`; btn.onclick = () => app.setActiveLayer(i);
                 container.appendChild(btn);
             }
@@ -807,7 +816,27 @@ const App = {
         updateBtnGroup(prefix, activeVal, values) {
             values.forEach(v => {
                 const btn = document.getElementById(prefix + v);
-                if (btn) btn.classList.toggle('btn-active', v === activeVal);
+                if (btn) {
+                    if (prefix === 'btn-layer-') return;
+                    btn.classList.toggle('btn-active', v === activeVal);
+                }
+            });
+        },
+        refreshActiveLayerInfo(app) {
+            const layerIdx = app.state.activeLayer;
+            const isVisible = app.layers[layerIdx].visible;
+            const statusText = isVisible ? "" : " (Hidden)";
+            
+            app.elements.layerName.innerText = `Active: Layer ${layerIdx + 1}${statusText}`;
+            app.elements.layerName.style.color = isVisible ? "#10b981" : "#f43f5e";
+
+            app.layers.forEach((l, i) => {
+                const b = document.getElementById(`btn-layer-${i}`);
+                if (b) {
+                    b.classList.toggle('btn-active', i === layerIdx);
+                    b.style.opacity = l.visible ? "1" : "0.3";
+                    b.style.textDecoration = l.visible ? "none" : "line-through";
+                }
             });
         },
         createAxisLabel(txt, x, y, w, h) {
@@ -816,8 +845,7 @@ const App = {
             App.elements.labels.appendChild(el);
         },
         showShapeMenu(app) {
-            app.state.isIconMode = true; 
-            app.state.isDrawing = false;
+            app.state.isIconMode = true; app.state.isDrawing = false;
             app.uctx.clearRect(0, 0, app.state.resolution, app.state.resolution);
             app.elements.menu.style.left = app.state.startCursor.x + 'px';
             app.elements.menu.style.top = app.state.startCursor.y + 'px';
