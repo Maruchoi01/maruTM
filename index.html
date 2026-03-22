@@ -368,7 +368,8 @@ const App = {
         startCursor: { x: 0, y: 0 },
         longPressTimer: null,
         gridStep: 600 / 8,
-        histories: Array.from({ length: 8 }, () => [])
+        histories: Array.from({ length: 8 }, () => []),
+        isInitialized: false
     },
 
     elements: {},
@@ -385,7 +386,12 @@ const App = {
 
         this.setTemplate('arena');
         this.setSystem('standard');
+        
+        // 초기화 플래그를 사용하여 첫 실행 시에는 숨겨지지 않도록 설정
+        this.state.isInitialized = false;
         this.setActiveLayer(0);
+        this.state.isInitialized = true;
+
         this.setDrawColor('#ffffff', 'white');
         this.setDrawTool('pen');
     },
@@ -441,24 +447,28 @@ const App = {
     },
 
     setActiveLayer(idx) {
-        // 이미 선택된 레이어를 다시 선택하면 가시성 토글
-        if (this.state.activeLayer === idx) {
+        const isCurrent = this.state.activeLayer === idx;
+        
+        // 이미 선택된 레이어를 다시 눌렀을 때만 토글 (초기화 단계 제외)
+        if (this.state.isInitialized && isCurrent) {
             this.toggleLayerVisibility(idx);
         } else {
             this.state.activeLayer = idx;
-            // 활성화될 때 숨겨져 있었다면 다시 보여줌 (선택했는데 안보이면 곤란하므로)
-            if (!this.layers[idx].visible) {
-                this.toggleLayerVisibility(idx);
-            }
+            // 다른 레이어로 전환될 때는 항상 보이게 설정
+            this.setLayerVisibility(idx, true);
         }
         this.UI.refreshActiveLayerInfo(this);
     },
 
+    setLayerVisibility(idx, visible) {
+        const layer = this.layers[idx];
+        layer.visible = visible;
+        layer.canvas.style.display = visible ? 'block' : 'none';
+    },
+
     toggleLayerVisibility(idx = this.state.activeLayer) {
         const layer = this.layers[idx];
-        layer.visible = !layer.visible;
-        layer.canvas.style.display = layer.visible ? 'block' : 'none';
-        this.UI.refreshActiveLayerInfo(this);
+        this.setLayerVisibility(idx, !layer.visible);
     },
 
     setDrawColor(color, label) {
